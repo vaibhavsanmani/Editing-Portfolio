@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+
 import {
   Play,
   Pause,
@@ -16,20 +17,51 @@ export default function VideoCard({
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
   const [hovered, setHovered] = useState(false);
+  const [showPoster, setShowPoster] = useState(true);
+  const [videoError, setVideoError] = useState(false);
 
-  // -----------------------------------------
+  // ============================================================
   // VIDEO URL
-  // -----------------------------------------
+  // ============================================================
 
   const videoSrc =
     video?.videoUrl ||
     video?.secureUrl ||
     video?.url ||
-    video?.src;
+    video?.src ||
+    "";
 
-  // -----------------------------------------
+  // ============================================================
+  // POSTER / COVER IMAGE
+  // ============================================================
+
+  const posterSrc =
+    video?.thumbnailUrl ||
+    video?.thumbnail ||
+    video?.coverUrl ||
+    video?.cover ||
+    video?.poster ||
+    "";
+
+  // ============================================================
+  // RESET WHEN VIDEO CHANGES
+  // ============================================================
+
+  useEffect(() => {
+    setPlaying(false);
+    setShowPoster(true);
+    setVideoError(false);
+
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+      videoRef.current.load();
+    }
+  }, [video?.id, videoSrc]);
+
+  // ============================================================
   // PLAY VIDEO
-  // -----------------------------------------
+  // ============================================================
 
   const playVideo = async () => {
     const element = videoRef.current;
@@ -37,23 +69,26 @@ export default function VideoCard({
     if (!element) return;
 
     try {
+      setVideoError(false);
+
       await element.play();
 
       setPlaying(true);
+      setShowPoster(false);
 
-      // Hide navbar
       setVideoPlaying?.(true);
     } catch (error) {
-      console.error(
-        "Video playback error:",
-        error
-      );
+      console.error("Video playback error:", error);
+
+      setVideoError(true);
+      setPlaying(false);
+      setVideoPlaying?.(false);
     }
   };
 
-  // -----------------------------------------
+  // ============================================================
   // PAUSE VIDEO
-  // -----------------------------------------
+  // ============================================================
 
   const pauseVideo = () => {
     const element = videoRef.current;
@@ -64,13 +99,12 @@ export default function VideoCard({
 
     setPlaying(false);
 
-    // Show navbar
     setVideoPlaying?.(false);
   };
 
-  // -----------------------------------------
-  // PLAY / PAUSE
-  // -----------------------------------------
+  // ============================================================
+  // TOGGLE PLAY
+  // ============================================================
 
   const togglePlay = async () => {
     const element = videoRef.current;
@@ -84,23 +118,25 @@ export default function VideoCard({
     }
   };
 
-  // -----------------------------------------
+  // ============================================================
   // MUTE
-  // -----------------------------------------
+  // ============================================================
 
   const toggleMute = () => {
     const element = videoRef.current;
 
     if (!element) return;
 
-    element.muted = !element.muted;
+    const nextMuted = !element.muted;
 
-    setMuted(element.muted);
+    element.muted = nextMuted;
+
+    setMuted(nextMuted);
   };
 
-  // -----------------------------------------
+  // ============================================================
   // FULLSCREEN
-  // -----------------------------------------
+  // ============================================================
 
   const toggleFullscreen = async () => {
     const element = videoRef.current;
@@ -110,20 +146,17 @@ export default function VideoCard({
     try {
       if (document.fullscreenElement) {
         await document.exitFullscreen();
-      } else {
+      } else if (element.requestFullscreen) {
         await element.requestFullscreen();
       }
     } catch (error) {
-      console.error(
-        "Fullscreen error:",
-        error
-      );
+      console.error("Fullscreen error:", error);
     }
   };
 
-  // -----------------------------------------
+  // ============================================================
   // VIDEO EVENTS
-  // -----------------------------------------
+  // ============================================================
 
   useEffect(() => {
     const element = videoRef.current;
@@ -132,23 +165,38 @@ export default function VideoCard({
 
     const handlePlay = () => {
       setPlaying(true);
+      setShowPoster(false);
 
-      // Hide navbar
       setVideoPlaying?.(true);
     };
 
     const handlePause = () => {
       setPlaying(false);
 
-      // Show navbar
       setVideoPlaying?.(false);
     };
 
     const handleEnded = () => {
       setPlaying(false);
+      setShowPoster(true);
 
-      // Show navbar after video ends
       setVideoPlaying?.(false);
+    };
+
+    const handleError = () => {
+      console.error(
+        "Video failed to load:",
+        videoSrc
+      );
+
+      setVideoError(true);
+      setPlaying(false);
+
+      setVideoPlaying?.(false);
+    };
+
+    const handleLoadedData = () => {
+      setVideoError(false);
     };
 
     element.addEventListener(
@@ -166,6 +214,16 @@ export default function VideoCard({
       handleEnded
     );
 
+    element.addEventListener(
+      "error",
+      handleError
+    );
+
+    element.addEventListener(
+      "loadeddata",
+      handleLoadedData
+    );
+
     return () => {
       element.removeEventListener(
         "play",
@@ -181,12 +239,22 @@ export default function VideoCard({
         "ended",
         handleEnded
       );
-    };
-  }, [setVideoPlaying]);
 
-  // -----------------------------------------
+      element.removeEventListener(
+        "error",
+        handleError
+      );
+
+      element.removeEventListener(
+        "loadeddata",
+        handleLoadedData
+      );
+    };
+  }, [videoSrc, setVideoPlaying]);
+
+  // ============================================================
   // CLEANUP
-  // -----------------------------------------
+  // ============================================================
 
   useEffect(() => {
     return () => {
@@ -194,13 +262,13 @@ export default function VideoCard({
     };
   }, [setVideoPlaying]);
 
-  // -----------------------------------------
+  // ============================================================
   // NO VIDEO
-  // -----------------------------------------
+  // ============================================================
 
   if (!videoSrc) {
     return (
-      <article className="w-full max-w-[240px]">
+      <article className="mx-auto w-full max-w-[240px]">
         <div
           className="
             flex
@@ -214,20 +282,37 @@ export default function VideoCard({
             bg-white/[0.03]
           "
         >
-          <p className="px-4 text-center text-xs text-white/30">
+          <p
+            className="
+              px-4
+              text-center
+              text-xs
+              text-white/30
+            "
+          >
             Video unavailable
           </p>
         </div>
 
         <div className="px-1 pt-3">
-          <h2 className="truncate text-sm font-medium text-white/70">
-            {video?.title ||
-              "Untitled Project"}
+          <h2
+            className="
+              truncate
+              text-sm
+              font-medium
+              text-white/70
+            "
+          >
+            {video?.title || "Untitled Project"}
           </h2>
         </div>
       </article>
     );
   }
+
+  // ============================================================
+  // MAIN CARD
+  // ============================================================
 
   return (
     <article
@@ -239,9 +324,9 @@ export default function VideoCard({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* ===================================== */}
-      {/* VIDEO CONTAINER */}
-      {/* ===================================== */}
+      {/* ========================================================
+          VIDEO CONTAINER
+      ======================================================== */}
 
       <div
         className="
@@ -262,32 +347,228 @@ export default function VideoCard({
           xl:w-[240px]
         "
       >
+        {/* ======================================================
+            VIDEO
+        ====================================================== */}
+
         <video
           ref={videoRef}
           src={videoSrc}
+          poster={posterSrc || undefined}
           className="
             absolute
             inset-0
             h-full
             w-full
             bg-black
-            object-contain
+            object-cover
           "
           muted={muted}
           playsInline
           preload="metadata"
           onClick={togglePlay}
+          onLoadedMetadata={() => {
+            setVideoError(false);
+          }}
         />
 
-        {/* ================================= */}
-        {/* OVERLAY */}
-        {/* ================================= */}
+        {/* ======================================================
+            CUSTOM POSTER OVERLAY
+
+            This is especially useful on mobile.
+        ====================================================== */}
+
+        {showPoster &&
+          !playing &&
+          posterSrc && (
+            <button
+              type="button"
+              onClick={playVideo}
+              aria-label="Play video"
+              className="
+                absolute
+                inset-0
+                z-10
+                h-full
+                w-full
+                cursor-pointer
+                bg-black
+              "
+            >
+              <img
+                src={posterSrc}
+                alt={
+                  video?.title ||
+                  "Video preview"
+                }
+                className="
+                  absolute
+                  inset-0
+                  h-full
+                  w-full
+                  object-cover
+                "
+              />
+
+              {/* Dark overlay */}
+
+              <div
+                className="
+                  absolute
+                  inset-0
+                  bg-black/10
+                  transition
+                  duration-300
+                  hover:bg-black/20
+                "
+              />
+
+              {/* Play button */}
+
+              <span
+                className="
+                  absolute
+                  left-1/2
+                  top-1/2
+                  flex
+                  h-11
+                  w-11
+                  -translate-x-1/2
+                  -translate-y-1/2
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-white
+                  text-black
+                  shadow-2xl
+                  transition
+                  duration-300
+                  hover:scale-110
+
+                  sm:h-12
+                  sm:w-12
+                "
+              >
+                <Play
+                  size={17}
+                  fill="currentColor"
+                  className="ml-0.5"
+                />
+              </span>
+            </button>
+          )}
+
+        {/* ======================================================
+            NO POSTER FALLBACK
+
+            If there is no thumbnail, show normal play button.
+        ====================================================== */}
+
+        {!posterSrc &&
+          !playing &&
+          !videoError && (
+            <button
+              type="button"
+              onClick={playVideo}
+              aria-label="Play video"
+              className="
+                absolute
+                left-1/2
+                top-1/2
+                z-10
+                flex
+                h-10
+                w-10
+                -translate-x-1/2
+                -translate-y-1/2
+                items-center
+                justify-center
+                rounded-full
+                bg-white
+                text-black
+                shadow-xl
+                transition
+                duration-300
+                hover:scale-110
+
+                sm:h-11
+                sm:w-11
+              "
+            >
+              <Play
+                size={16}
+                fill="currentColor"
+                className="ml-0.5"
+              />
+            </button>
+          )}
+
+        {/* ======================================================
+            VIDEO ERROR
+        ====================================================== */}
+
+        {videoError && (
+          <div
+            className="
+              absolute
+              inset-0
+              z-20
+              flex
+              flex-col
+              items-center
+              justify-center
+              bg-black
+              px-5
+              text-center
+            "
+          >
+            <p
+              className="
+                text-xs
+                text-white/40
+              "
+            >
+              Unable to load video
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                setVideoError(false);
+
+                if (videoRef.current) {
+                  videoRef.current.load();
+                }
+              }}
+              className="
+                mt-3
+                rounded-full
+                border
+                border-white/10
+                px-3
+                py-1.5
+                text-[10px]
+                text-white/60
+                transition
+                hover:bg-white
+                hover:text-black
+              "
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* ======================================================
+            HOVER OVERLAY
+        ====================================================== */}
 
         <div
           className={`
             pointer-events-none
             absolute
             inset-0
+            z-[5]
             bg-black/10
             transition-opacity
             duration-300
@@ -300,49 +581,49 @@ export default function VideoCard({
           `}
         />
 
-        {/* ================================= */}
-        {/* CENTER PLAY BUTTON */}
-        {/* ================================= */}
+        {/* ======================================================
+            CENTER PLAY BUTTON WHEN POSTER IS NOT USED
+        ====================================================== */}
 
-        {!playing && (
-          <button
-            type="button"
-            onClick={playVideo}
-            aria-label="Play video"
-            className="
-              absolute
-              left-1/2
-              top-1/2
-              flex
-              h-10
-              w-10
-              -translate-x-1/2
-              -translate-y-1/2
-              items-center
-              justify-center
-              rounded-full
-              bg-white
-              text-black
-              shadow-xl
-              transition
-              duration-300
-              hover:scale-110
+        {!playing &&
+          !showPoster &&
+          !videoError && (
+            <button
+              type="button"
+              onClick={playVideo}
+              aria-label="Play video"
+              className="
+                absolute
+                left-1/2
+                top-1/2
+                z-10
+                flex
+                h-10
+                w-10
+                -translate-x-1/2
+                -translate-y-1/2
+                items-center
+                justify-center
+                rounded-full
+                bg-white
+                text-black
+                shadow-xl
+                transition
+                duration-300
+                hover:scale-110
+              "
+            >
+              <Play
+                size={16}
+                fill="currentColor"
+                className="ml-0.5"
+              />
+            </button>
+          )}
 
-              sm:h-11
-              sm:w-11
-            "
-          >
-            <Play
-              size={16}
-              fill="currentColor"
-              className="ml-0.5"
-            />
-          </button>
-        )}
-
-        {/* ================================= */}
-        {/* CONTROLS */}
-        {/* ================================= */}
+        {/* ======================================================
+            CONTROLS
+        ====================================================== */}
 
         <div
           className={`
@@ -350,6 +631,7 @@ export default function VideoCard({
             bottom-0
             left-0
             right-0
+            z-20
             flex
             items-center
             justify-between
@@ -364,7 +646,7 @@ export default function VideoCard({
             duration-300
 
             ${
-              hovered
+              hovered || playing
                 ? "translate-y-0 opacity-100"
                 : "translate-y-2 opacity-0"
             }
@@ -373,7 +655,6 @@ export default function VideoCard({
           {/* LEFT CONTROLS */}
 
           <div className="flex items-center gap-2">
-
             {/* PLAY / PAUSE */}
 
             <button
@@ -481,14 +762,19 @@ export default function VideoCard({
         </div>
       </div>
 
-      {/* ===================================== */}
-      {/* VIDEO INFO */}
-      {/* ===================================== */}
+      {/* ========================================================
+          VIDEO INFO
+      ======================================================== */}
 
       <div className="px-1 pt-3">
-
-        <div className="flex items-start justify-between gap-2">
-
+        <div
+          className="
+            flex
+            items-start
+            justify-between
+            gap-2
+          "
+        >
           <h2
             className="
               min-w-0
