@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="redBase" cx="38%" cy="28%" r="78%">
+      <stop offset="0%" stop-color="#d91b20"/>
+      <stop offset="55%" stop-color="#bd0006"/>
+      <stop offset="100%" stop-color="#970006"/>
+    </radialGradient>
+
+    <clipPath id="circleClip">
+      <circle cx="256" cy="256" r="256"/>
+    </clipPath>
+
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+
+  <!-- Perfect circular edge: no white border -->
+  <circle cx="256" cy="256" r="256" fill="url(#redBase)"/>
+
+  <g clip-path="url(#circleClip)" opacity="0.28">
+    <ellipse cx="165" cy="90" rx="120" ry="75" fill="#f45a5a" transform="rotate(-20 165 90)"/>
+    <ellipse cx="390" cy="150" rx="125" ry="210" fill="#f33d42" transform="rotate(-20 390 150)"/>
+    <ellipse cx="155" cy="455" rx="150" ry="90" fill="#ef4b50" transform="rotate(20 155 455)"/>
+    <ellipse cx="425" cy="370" rx="150" ry="90" fill="#f34b50" transform="rotate(-25 425 370)"/>
+  </g>
+
+  <g clip-path="url(#circleClip)" fill="#ff4c52" opacity="0.13">
+    <path d="M0 335 C80 280 130 330 155 390 C185 460 120 510 0 512Z"/>
+    <path d="M315 0 C350 85 440 75 512 20 L512 180 C450 190 375 145 315 0Z"/>
+  </g>
+
+  <!-- Centered wordmark -->
+  <text
+    x="256"
+    y="300"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="158"
+    font-weight="600"
+    letter-spacing="-8"
+    fill="#fffaf2">snip</text>
+
+  <!-- Elegant accent above the i -->
+  <path
+    d="M318 161 C345 151 365 132 371 104 C372 135 357 157 325 174 Z"
+    fill="#fffaf2"/>
+
+  <!-- Small sparkle -->
+  <path
+    d="M105 337
+       C111 350 119 358 133 364
+       C119 370 111 378 105 392
+       C99 378 91 370 77 364
+       C91 358 99 350 105 337Z"
+    fill="#fffaf2"/>
+</svg>
