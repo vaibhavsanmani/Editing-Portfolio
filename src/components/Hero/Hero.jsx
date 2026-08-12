@@ -13,7 +13,7 @@ export default function Hero() {
         overflow-hidden
         bg-[#050505]
         px-5
-        pb-20
+        pb-0
         pt-32
         text-white
         md:px-10
