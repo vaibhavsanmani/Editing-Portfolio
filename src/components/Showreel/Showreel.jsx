@@ -99,7 +99,7 @@ export default function Showreel({
   }, []);
 
   return (
-    <section className="w-full overflow-hidden">
+    <section className="w-full overflow-hidden bg-[#050505]">
       {/* VIDEOS */}
 
       {loading ? (
