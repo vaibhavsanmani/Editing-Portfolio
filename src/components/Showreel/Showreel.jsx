@@ -109,9 +109,12 @@ export default function Showreel({
             grid
             w-full
             grid-cols-1
-            gap-8
+            gap-x-4
+            gap-y-10
             sm:grid-cols-2
+            sm:gap-x-6
             lg:grid-cols-3
+            lg:gap-x-8
           "
         >
           {[1, 2, 3].map((item) => (

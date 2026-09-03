@@ -1,57 +1,89 @@
 import { useEffect, useState } from "react";
+
+import { motion } from "framer-motion";
 import {
   collection,
   getDocs,
-  orderBy,
-  query,
 } from "firebase/firestore";
 
-import { Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
-
-import { db } from "../firebase/firebase";
 import VideoCard from "../components/Video/videoCard";
+import { db } from "../firebase/firebase";
 
 export default function Work({
   setVideoPlaying,
 }) {
-  const [videos, setVideos] = useState([]);
+  const [workVideos, setWorkVideos] =
+    useState([]);
 
-  const [loading, setLoading] = useState(true);
-
-  const [error, setError] = useState("");
+  const [loading, setLoading] =
+    useState(true);
 
   useEffect(() => {
     const fetchVideos = async () => {
       try {
         setLoading(true);
 
-        setError("");
+        // ============================================
+        // GET ALL VIDEOS
+        // ============================================
 
-        const videosQuery = query(
-          collection(db, "videos"),
-          orderBy("createdAt", "desc")
+        const snapshot = await getDocs(
+          collection(db, "videos")
         );
 
-        const snapshot =
-          await getDocs(videosQuery);
+        const videos = snapshot.docs.map(
+          (document) => ({
+            id: document.id,
+            ...document.data(),
+          })
+        );
 
-        const fetchedVideos =
-          snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
+        // ============================================
+        // SORT USING ADMIN POSITION
+        // ============================================
 
-        setVideos(fetchedVideos);
-      } catch (err) {
+        videos.sort((a, b) => {
+          const aPosition =
+            typeof a.position === "number"
+              ? a.position
+              : Infinity;
+
+          const bPosition =
+            typeof b.position === "number"
+              ? b.position
+              : Infinity;
+
+          // Lower position = higher priority
+          if (aPosition !== bPosition) {
+            return aPosition - bPosition;
+          }
+
+          // ============================================
+          // FALLBACK
+          // ============================================
+
+          const aTime =
+            a.createdAt?.seconds || 0;
+
+          const bTime =
+            b.createdAt?.seconds || 0;
+
+          return bTime - aTime;
+        });
+
+        console.log(
+          "Work videos loaded:",
+          videos
+        );
+
+        setWorkVideos(videos);
+      } catch (error) {
         console.error(
-          "Error fetching videos:",
-          err
+          "Error loading work videos:",
+          error
         );
 
-        setError(
-          "Unable to load videos right now."
-        );
+        setWorkVideos([]);
       } finally {
         setLoading(false);
       }
@@ -61,240 +93,138 @@ export default function Work({
   }, []);
 
   return (
-    <main
-      className="
-        min-h-screen
-        bg-black
-        px-5
-        pb-24
-        pt-32
-        text-white
-
-        sm:px-6
-        md:px-10
-      "
-    >
-
-      <div
-        className="
-          mx-auto
-          w-full
-          max-w-7xl
-        "
-      >
-
-        {/* ================================= */}
-        {/* PAGE HEADER */}
-        {/* ================================= */}
-
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 25,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.6,
-          }}
-          className="mb-14 md:mb-16"
-        >
-
-          {/* LABEL */}
-
-          <div
-            className="
-              mb-5
-              flex
-              items-center
-              gap-3
-            "
+    <main className="bg-black min-h-screen">
+      {/* HEADER */}
+      <section className="pt-32 pb-12 px-6">
+        <div className="mx-auto max-w-6xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
           >
-
-            <span
+            <h1
               className="
-                h-2
-                w-2
-                shrink-0
-                rounded-full
-                bg-white
-              "
-            />
-
-            <span
-              className="
-                text-xs
-                uppercase
-                tracking-[0.3em]
-                text-white/40
+                text-4xl
+                md:text-5xl
+                lg:text-6xl
+                font-bold
+                text-white
+                mb-4
               "
             >
-              Selected Work
-            </span>
-
-          </div>
-
-          {/* TITLE */}
-
-          <h1
-            className="
-              text-6xl
-              font-semibold
-              leading-[0.9]
-              tracking-[-0.06em]
-
-              sm:text-7xl
-              md:text-8xl
-            "
-          >
-            Videos
-          </h1>
-
-        </motion.div>
-
-        {/* ================================= */}
-        {/* LOADING */}
-        {/* ================================= */}
-
-        {loading && (
-          <div
-            className="
-              flex
-              min-h-[300px]
-              items-center
-              justify-center
-            "
-          >
-            <Loader2
-              size={28}
+              My Work
+            </h1>
+            <p
               className="
-                animate-spin
-                text-white/40
+                text-lg
+                text-white/60
+                max-w-2xl
               "
-            />
-          </div>
-        )}
+            >
+              Explore my latest video editing projects and creative work.
+            </p>
+          </motion.div>
+        </div>
+      </section>
 
-        {/* ================================= */}
-        {/* ERROR */}
-        {/* ================================= */}
-
-        {!loading && error && (
-          <div
-            className="
-              rounded-3xl
-              border
-              border-red-500/20
-              bg-red-500/5
-              p-8
-              text-sm
-              text-red-400
-            "
-          >
-            {error}
-          </div>
-        )}
-
-        {/* ================================= */}
-        {/* EMPTY */}
-        {/* ================================= */}
-
-        {!loading &&
-          !error &&
-          videos.length === 0 && (
+      {/* VIDEOS GRID */}
+      <section className="pb-20 px-6">
+        <div className="mx-auto max-w-6xl">
+          {loading ? (
             <div
               className="
-                rounded-3xl
-                border
-                border-white/10
-                bg-white/[0.02]
-                p-12
-                text-center
+                grid
+                w-full
+                grid-cols-1
+                gap-8
+                sm:grid-cols-2
+                lg:grid-cols-3
               "
             >
-              <p
-                className="
-                  text-sm
-                  text-white/40
-                "
-              >
-                No videos uploaded yet.
-              </p>
+              {[1, 2, 3, 4, 5, 6].map(
+                (item) => (
+                  <div
+                    key={item}
+                    className="
+                      aspect-[9/16]
+                      w-full
+                      animate-pulse
+                      rounded-3xl
+                      bg-white/[0.04]
+                    "
+                  />
+                )
+              )}
             </div>
-          )}
-
-        {/* ================================= */}
-        {/* VIDEO GRID */}
-        {/* ================================= */}
-
-        {!loading &&
-          !error &&
-          videos.length > 0 && (
-            <motion.div
-              initial={{
-                opacity: 0,
-              }}
-              animate={{
-                opacity: 1,
-              }}
-              transition={{
-                duration: 0.5,
-              }}
+          ) : workVideos.length > 0 ? (
+            <div
               className="
                 grid
+                w-full
                 grid-cols-1
-                justify-items-center
-                gap-x-6
-                gap-y-12
-
+                gap-8
                 sm:grid-cols-2
-                sm:gap-x-8
-
                 lg:grid-cols-3
-                lg:gap-x-10
-
-                xl:grid-cols-4
-                xl:gap-x-12
               "
             >
-
-              {videos.map(
+              {workVideos.map(
                 (video, index) => (
                   <motion.div
                     key={video.id}
                     initial={{
                       opacity: 0,
-                      y: 20,
+                      y: 40,
                     }}
-                    animate={{
+                    whileInView={{
                       opacity: 1,
                       y: 0,
                     }}
-                    transition={{
-                      duration: 0.4,
-                      delay:
-                        index * 0.05,
+                    viewport={{
+                      once: true,
+                      amount: 0.2,
                     }}
-                    className="w-full"
+                    transition={{
+                      duration: 0.6,
+                      delay: index * 0.1,
+                    }}
+                    className="min-w-0"
                   >
-
                     <VideoCard
                       video={video}
                       setVideoPlaying={
                         setVideoPlaying
                       }
                     />
-
                   </motion.div>
                 )
               )}
-
-            </motion.div>
+            </div>
+          ) : (
+            <div
+              className="
+                flex
+                min-h-[400px]
+                w-full
+                items-center
+                justify-center
+                rounded-3xl
+                border
+                border-white/10
+                bg-white/[0.02]
+              "
+            >
+              <p
+                className="
+                  text-sm
+                  text-white/30
+                "
+              >
+                No work videos available yet.
+              </p>
+            </div>
           )}
-
-      </div>
+        </div>
+      </section>
     </main>
   );
 }
