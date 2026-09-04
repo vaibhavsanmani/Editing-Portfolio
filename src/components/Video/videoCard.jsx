@@ -11,6 +11,7 @@ import {
 export default function VideoCard({
   video,
   setVideoPlaying,
+  className = "",
 }) {
   const videoRef = useRef(null);
 
@@ -268,7 +269,7 @@ export default function VideoCard({
 
   if (!videoSrc) {
     return (
-      <article className="mx-auto w-full max-w-[240px]">
+      <article className={`mx-auto w-full max-w-[280px] sm:max-w-[240px] ${className}`}>
         <div
           className="
             flex
@@ -276,7 +277,7 @@ export default function VideoCard({
             items-center
             justify-center
             overflow-hidden
-            rounded-2xl
+            rounded-[24px]
             border
             border-white/10
             bg-white/[0.03]
@@ -316,41 +317,24 @@ export default function VideoCard({
 
   return (
     <article
-      className="
-        mx-auto
-        w-full
-        max-w-[240px]
-      "
+      className={`mx-auto w-full max-w-[280px] sm:max-w-[240px] ${className}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* ========================================================
-          VIDEO CONTAINER
-      ======================================================== */}
-
       <div
         className="
           relative
           mx-auto
-          w-[200px]
+          w-full
           overflow-hidden
-          rounded-2xl
+          rounded-[24px]
           border
           border-white/10
           bg-black
-
           aspect-[9/16]
-
-          sm:w-[210px]
-          md:w-[220px]
-          lg:w-[230px]
-          xl:w-[240px]
+          shadow-[0_20px_45px_rgba(0,0,0,0.35)]
         "
       >
-        {/* ======================================================
-            VIDEO
-        ====================================================== */}
-
         <video
           ref={videoRef}
           src={videoSrc}
@@ -372,12 +356,6 @@ export default function VideoCard({
           }}
         />
 
-        {/* ======================================================
-            CUSTOM POSTER OVERLAY
-
-            This is especially useful on mobile.
-        ====================================================== */}
-
         {showPoster &&
           !playing &&
           posterSrc && (
@@ -398,8 +376,7 @@ export default function VideoCard({
               <img
                 src={posterSrc}
                 alt={
-                  video?.title ||
-                  "Video preview"
+                  video?.title || "Video preview"
                 }
                 className="
                   absolute
@@ -409,8 +386,6 @@ export default function VideoCard({
                   object-cover
                 "
               />
-
-              {/* Dark overlay */}
 
               <div
                 className="
@@ -422,8 +397,6 @@ export default function VideoCard({
                   hover:bg-black/20
                 "
               />
-
-              {/* Play button */}
 
               <span
                 className="
@@ -457,12 +430,6 @@ export default function VideoCard({
               </span>
             </button>
           )}
-
-        {/* ======================================================
-            NO POSTER FALLBACK
-
-            If there is no thumbnail, show normal play button.
-        ====================================================== */}
 
         {!posterSrc &&
           !playing &&
@@ -502,10 +469,6 @@ export default function VideoCard({
               />
             </button>
           )}
-
-        {/* ======================================================
-            VIDEO ERROR
-        ====================================================== */}
 
         {videoError && (
           <div
@@ -559,10 +522,6 @@ export default function VideoCard({
           </div>
         )}
 
-        {/* ======================================================
-            HOVER OVERLAY
-        ====================================================== */}
-
         <div
           className={`
             pointer-events-none
@@ -580,10 +539,6 @@ export default function VideoCard({
             }
           `}
         />
-
-        {/* ======================================================
-            CENTER PLAY BUTTON WHEN POSTER IS NOT USED
-        ====================================================== */}
 
         {!playing &&
           !showPoster &&
@@ -621,10 +576,6 @@ export default function VideoCard({
             </button>
           )}
 
-        {/* ======================================================
-            CONTROLS
-        ====================================================== */}
-
         <div
           className={`
             absolute
@@ -652,11 +603,7 @@ export default function VideoCard({
             }
           `}
         >
-          {/* LEFT CONTROLS */}
-
           <div className="flex items-center gap-2">
-            {/* PLAY / PAUSE */}
-
             <button
               type="button"
               onClick={togglePlay}
@@ -697,8 +644,6 @@ export default function VideoCard({
               )}
             </button>
 
-            {/* MUTE */}
-
             <button
               type="button"
               onClick={toggleMute}
@@ -733,8 +678,6 @@ export default function VideoCard({
             </button>
           </div>
 
-          {/* FULLSCREEN */}
-
           <button
             type="button"
             onClick={toggleFullscreen}
@@ -762,10 +705,6 @@ export default function VideoCard({
         </div>
       </div>
 
-      {/* ========================================================
-          VIDEO INFO
-      ======================================================== */}
-
       <div className="px-1 pt-3">
         <div
           className="
@@ -785,8 +724,7 @@ export default function VideoCard({
               text-white
             "
           >
-            {video?.title ||
-              "Untitled Project"}
+            {video?.title || "Untitled Project"}
           </h2>
 
           {video?.category && (
