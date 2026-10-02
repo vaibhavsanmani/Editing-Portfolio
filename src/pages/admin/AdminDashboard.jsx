@@ -217,7 +217,7 @@ export default function AdminDashboard() {
   const [title, setTitle] = useState("");
 
   const [category, setCategory] =
-    useState("Reels");
+    useState("Reel");
 
   const [description, setDescription] =
     useState("");
@@ -762,7 +762,7 @@ export default function AdminDashboard() {
 
       setDescription("");
 
-      setCategory("Reels");
+      setCategory("Reel");
 
       setProgress(100);
 
@@ -1403,38 +1403,17 @@ export default function AdminDashboard() {
                 disabled={uploading}
               >
                 <option
-                  value="Reels"
+                  value="Reel"
                   className="bg-black"
                 >
-                  Reels
+                  Reel
                 </option>
 
                 <option
-                  value="Commercial"
+                  value="Poster"
                   className="bg-black"
                 >
-                  Commercial
-                </option>
-
-                <option
-                  value="Social Media"
-                  className="bg-black"
-                >
-                  Social Media
-                </option>
-
-                <option
-                  value="Brand"
-                  className="bg-black"
-                >
-                  Brand
-                </option>
-
-                <option
-                  value="Other"
-                  className="bg-black"
-                >
-                  Other
+                  Poster
                 </option>
               </select>
             </div>

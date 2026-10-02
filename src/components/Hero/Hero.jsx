@@ -135,17 +135,6 @@ export default function Hero() {
                 Book a project
               </Link>
             </div>
-
-            <div className="mt-10 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-white/50">
-              {["Brand films", "Commercials", "Social edits"].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full border border-white/10 bg-white/[0.02] px-3 py-1.5"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
           </motion.div>
 
           <motion.div

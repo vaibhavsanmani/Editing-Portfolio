@@ -13,6 +13,11 @@ import VideoCard from "../Video/videoCard";
 
 import { db } from "../../firebase/firebase";
 
+const tabs = [
+  { key: "posts", label: "Posts" },
+  { key: "reels", label: "Reels" },
+];
+
 export default function Showreel({
   setVideoPlaying,
 }) {
@@ -25,6 +30,9 @@ export default function Showreel({
   const [loading, setLoading] =
     useState(true);
 
+  const [activeTab, setActiveTab] =
+    useState("posts");
+
   useEffect(() => {
     const fetchVideos = async () => {
       try {
@@ -34,13 +42,12 @@ export default function Showreel({
           collection(db, "videos")
         );
 
-        const videos =
-          snapshot.docs.map(
-            (document) => ({
-              id: document.id,
-              ...document.data(),
-            })
-          );
+        const videos = snapshot.docs.map(
+          (document) => ({
+            id: document.id,
+            ...document.data(),
+          })
+        );
 
         videos.sort((a, b) => {
           const positionA =
@@ -66,9 +73,7 @@ export default function Showreel({
           return timeB - timeA;
         });
 
-        setShowreelVideos(
-          videos.slice(0, 3)
-        );
+        setShowreelVideos(videos.slice(0, 6));
       } catch (error) {
         console.error(
           "Error loading showreel videos:",
@@ -83,6 +88,59 @@ export default function Showreel({
 
     fetchVideos();
   }, []);
+
+  const renderPosts = () => (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      {showreelVideos.map((video) => (
+        <article
+          key={`${video.id}-post`}
+          className="group relative overflow-hidden rounded-[22px] border border-white/10 bg-black"
+        >
+          <img
+            src={
+              video.thumbnailUrl ||
+              video.thumbnail ||
+              video.coverUrl ||
+              video.cover ||
+              video.poster ||
+              ""
+            }
+            alt={video.title || "Post preview"}
+            className="aspect-square w-full object-cover transition duration-300 group-hover:scale-105"
+          />
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+
+          <span className="absolute bottom-2 left-2 rounded-full border border-white/15 bg-black/35 px-2 py-1 text-[9px] uppercase tracking-[0.16em] text-white/80 backdrop-blur-sm">
+            Post
+          </span>
+        </article>
+      ))}
+    </div>
+  );
+
+  const renderReels = () => (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {showreelVideos.map((video, index) => (
+        <motion.div
+          key={`${video.id}-reel`}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.45, delay: index * 0.05 }}
+          className="min-w-0"
+        >
+          <VideoCard
+            video={video}
+            index={index}
+            activeVideo={activeVideo}
+            setActiveVideo={setActiveVideo}
+            setVideoPlaying={setVideoPlaying}
+          />
+        </motion.div>
+      ))}
+    </div>
+  );
 
   return (
     <section className="w-full overflow-hidden bg-[#050505] px-4 pb-20 pt-8 sm:px-6 lg:px-8">
@@ -132,34 +190,41 @@ export default function Showreel({
             ))}
           </div>
         ) : showreelVideos.length > 0 ? (
-          <div
-            className="
-              grid
-              w-full
-              grid-cols-1
-              gap-6
-              sm:grid-cols-2
-              lg:grid-cols-3
-            "
-          >
-            {showreelVideos.map((video, index) => (
-              <motion.div
-                key={video.id}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="min-w-0"
+          <div className="rounded-[30px] border border-white/10 bg-white/[0.02] p-4 sm:p-5">
+            <div className="mb-5 flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="relative flex rounded-full border border-white/10 bg-[#111111] p-1">
+                {tabs.map((tab) => {
+                  const isActive = activeTab === tab.key;
+
+                  return (
+                    <button
+                      key={tab.key}
+                      type="button"
+                      onClick={() => setActiveTab(tab.key)}
+                      className={`relative z-10 rounded-full px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] transition-all duration-200 ${
+                        isActive
+                          ? "text-black"
+                          : "text-white/60 hover:text-white"
+                      }`}
+                    >
+                      {isActive && (
+                        <span className="absolute inset-0 -z-10 rounded-full bg-white" />
+                      )}
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <Link
+                to="/work"
+                className="text-[10px] uppercase tracking-[0.18em] text-white/55 transition hover:text-white"
               >
-                <VideoCard
-                  video={video}
-                  index={index}
-                  activeVideo={activeVideo}
-                  setActiveVideo={setActiveVideo}
-                  setVideoPlaying={setVideoPlaying}
-                />
-              </motion.div>
-            ))}
+                View all
+              </Link>
+            </div>
+
+            {activeTab === "posts" ? renderPosts() : renderReels()}
           </div>
         ) : (
           <div

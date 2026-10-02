@@ -1,11 +1,12 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, LockKeyhole, Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 
 export default function Navbar({ videoPlaying = false }) {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const isHomePage = location.pathname === "/";
 
   const navItems = [
     { name: "Work", path: "/work" },
@@ -152,42 +153,69 @@ export default function Navbar({ videoPlaying = false }) {
               })}
             </div>
 
-            {/* ================= DESKTOP CTA ================= */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {isHomePage && (
+                <Link
+                  to="/admin/login"
+                  aria-label="Admin login"
+                  className="hidden md:flex"
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="
+                      flex
+                      h-10
+                      w-10
+                      items-center
+                      justify-center
+                      rounded-full
+                      border
+                      border-white/10
+                      bg-white/[0.03]
+                      text-white/80
+                      transition
+                      hover:border-white/20
+                      hover:bg-white/[0.06]
+                    "
+                  >
+                    <LockKeyhole size={16} strokeWidth={2.2} />
+                  </motion.div>
+                </Link>
+              )}
 
-            <Link
-              to="/contact"
-              className="hidden md:block"
-            >
-              <motion.div
-                whileHover={{
-                  scale: 1.03,
-                }}
-                whileTap={{
-                  scale: 0.96,
-                }}
-                className="
-                  flex
-                  items-center
-                  gap-2
-                  rounded-full
-                  bg-white
-                  px-5
-                  py-2.5
-                  text-sm
-                  font-medium
-                  text-black
-                  lg:px-6
-                  lg:py-3
-                "
-              >
-                Let's Talk
+              <Link to="/contact" className="hidden md:block">
+                <motion.div
+                  whileHover={{
+                    scale: 1.03,
+                  }}
+                  whileTap={{
+                    scale: 0.96,
+                  }}
+                  className="
+                    flex
+                    items-center
+                    gap-2
+                    rounded-full
+                    bg-white
+                    px-5
+                    py-2.5
+                    text-sm
+                    font-medium
+                    text-black
+                    lg:px-6
+                    lg:py-3
+                  "
+                >
+                  Let's Talk
 
-                <ArrowUpRight
-                  size={17}
-                  strokeWidth={2}
-                />
-              </motion.div>
-            </Link>
+                  <ArrowUpRight
+                    size={17}
+                    strokeWidth={2}
+                  />
+                </motion.div>
+              </Link>
+            </div>
 
             {/* ================= MOBILE MENU BUTTON ================= */}
 
@@ -291,7 +319,31 @@ export default function Navbar({ videoPlaying = false }) {
                     );
                   })}
 
-                  {/* MOBILE CTA */}
+                  {isHomePage && (
+                    <Link
+                      to="/admin/login"
+                      onClick={closeMenu}
+                      className="mt-5"
+                    >
+                      <div className="
+                        flex
+                        items-center
+                        justify-between
+                        rounded-full
+                        border
+                        border-white/10
+                        bg-white/[0.03]
+                        px-5
+                        py-3.5
+                        text-sm
+                        font-medium
+                        text-white
+                      ">
+                        Admin
+                        <LockKeyhole size={16} />
+                      </div>
+                    </Link>
+                  )}
 
                   <Link
                     to="/contact"
