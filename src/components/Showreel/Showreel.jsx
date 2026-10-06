@@ -14,8 +14,8 @@ import VideoCard from "../Video/videoCard";
 import { db } from "../../firebase/firebase";
 
 const tabs = [
-  { key: "posts", label: "Posts" },
   { key: "reels", label: "Reels" },
+  { key: "posts", label: "Posts" },
 ];
 
 export default function Showreel({
@@ -31,7 +31,7 @@ export default function Showreel({
     useState(true);
 
   const [activeTab, setActiveTab] =
-    useState("posts");
+    useState("reels");
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -224,7 +224,7 @@ export default function Showreel({
               </Link>
             </div>
 
-            {activeTab === "posts" ? renderPosts() : renderReels()}
+            {activeTab === "reels" ? renderReels() : renderPosts()}
           </div>
         ) : (
           <div

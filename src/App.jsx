@@ -13,6 +13,7 @@ import Contact from "./pages/Contact";
 import Login from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import Chatbot from "./components/AI/Chatbot";
 
 export default function App() {
   const [videoPlaying, setVideoPlaying] = useState(false);
@@ -62,6 +63,8 @@ export default function App() {
           }
         />
       </Routes>
+
+      <Chatbot />
       <Footer/>
     </>
   );
