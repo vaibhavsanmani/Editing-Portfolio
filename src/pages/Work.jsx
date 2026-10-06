@@ -149,6 +149,16 @@ export default function Work({
       event.touches[0]?.clientX ?? null;
   };
 
+  const handleTouchMove = (event) => {
+    if (touchStartX.current === null) return;
+
+    const moveX = event.touches[0]?.clientX ?? touchStartX.current;
+    const deltaX = moveX - touchStartX.current;
+
+    // Prevent scrolling by setting the touch action to pan-y
+    event.preventDefault();
+  };
+
   const handleTouchEnd = (event) => {
     if (touchStartX.current === null) return;
 
@@ -229,11 +239,16 @@ export default function Work({
           ) : visibleVideos.length > 0 ? (
             <>
               <div
-                className="relative md:hidden"
+                className="relative md:hidden px-3 py-4"
                 onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
+                style={{
+                  touchAction: "pan-y",
+                  overscrollBehavior: "contain",
+                }}
               >
-                <div className="relative flex min-h-[540px] items-center justify-center overflow-visible">
+                <div className="relative flex min-h-[540px] items-center justify-center overflow-visible px-2 py-3">
                   {visibleVideos.map((video, index) => {
                     const rawOffset = index - activeMobileIndex;
                     const wrappedOffset =
