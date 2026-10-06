@@ -9,13 +9,14 @@ export default function Hero() {
       id="home"
       className="
         relative
-        min-h-screen
+        min-h-[0]
         overflow-hidden
         bg-[#050505]
         px-4
         pb-16
-        pt-28
+        pt-16
         text-white
+        sm:min-h-screen
         sm:px-6
         md:px-10
         md:pt-32
