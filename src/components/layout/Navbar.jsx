@@ -52,8 +52,9 @@ export default function Navbar({ videoPlaying = false }) {
               rounded-full
               border
               border-white/10
-              bg-black/70
+              bg-black/90
               px-5
+              shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_12px_40px_rgba(0,0,0,0.45)]
               backdrop-blur-xl
               sm:h-[70px]
               sm:px-6
