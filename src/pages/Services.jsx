@@ -14,8 +14,6 @@ const services = [
     number: "01",
     title: "Cinematic Reel",
     subtitle: "Shoot + Edit",
-    price: "₹1,500+",
-    label: "PER REEL",
     description:
       "High-quality cinematic reels shot and edited to make your brand stand out.",
     tools: "iPhone 15  •  CapCut",
@@ -28,15 +26,12 @@ const services = [
       "Text / Titles",
       "Basic effects",
     ],
-    note: "Extra charges applicable depending on location, travel & shoot duration.",
     icon: Video,
   },
   {
     number: "02",
     title: "Informative Reel",
     subtitle: "Basic Editing",
-    price: "₹1,200+",
-    label: "PER REEL",
     description:
       "Clean and engaging short-form content designed for creators, brands and businesses.",
     tools: "Premiere Pro",
@@ -48,15 +43,12 @@ const services = [
       "Audio sync & enhancement",
       "Basic transitions",
     ],
-    note: "Price may vary depending on video length, content and amount of work.",
     icon: MessageCircle,
   },
   {
     number: "03",
     title: "Informative Reel",
     subtitle: "Motion Graphics",
-    price: "₹1,800+",
-    label: "PER REEL",
     description:
       "Advanced edits with motion graphics and visual elements that keep viewers engaged.",
     tools: "Premiere Pro  •  After Effects",
@@ -68,7 +60,6 @@ const services = [
       "Charts & Visuals",
       "Custom Transitions",
     ],
-    note: "Price may increase based on the complexity and amount of motion graphics used.",
     icon: Sparkles,
   },
 ];
@@ -185,25 +176,6 @@ export default function Services() {
                     {service.description}
                   </p>
 
-                  {/* Price */}
-                  <div className="mt-8 border-t border-white/10 pt-7">
-
-                    <p className="text-[11px] uppercase tracking-[0.25em] text-white/30">
-                      Starting from
-                    </p>
-
-                    <div className="mt-2 flex items-end gap-2">
-                      <span className="text-4xl font-semibold tracking-[-0.05em]">
-                        {service.price}
-                      </span>
-
-                      <span className="mb-1 text-[10px] uppercase tracking-[0.2em] text-white/30">
-                        {service.label}
-                      </span>
-                    </div>
-
-                  </div>
-
                   {/* Tools */}
                   <div className="mt-7 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
                     <p className="text-xs text-white/50">
@@ -240,24 +212,6 @@ export default function Services() {
 
                 </div>
 
-                {/* Bottom Note */}
-                <div className="mt-auto border-t border-white/10 bg-white/[0.025] px-7 py-6 md:px-8">
-
-                  <div className="flex gap-3">
-
-                    <MapPin
-                      size={17}
-                      className="mt-0.5 shrink-0 text-white/40"
-                    />
-
-                    <p className="text-xs leading-relaxed text-white/35">
-                      {service.note}
-                    </p>
-
-                  </div>
-
-                </div>
-
               </motion.article>
             );
           })}
@@ -281,17 +235,15 @@ export default function Services() {
             <div>
 
               <p className="mb-5 text-xs uppercase tracking-[0.25em] text-white/40">
-                Important
+                Tailored For You
               </p>
 
               <h3 className="text-2xl font-medium tracking-[-0.03em] md:text-3xl">
-                Every project is different.
+                Every project is custom-built.
               </h3>
 
               <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/40">
-                These prices are starting points. Final pricing depends on
-                your requirements, video length, shooting location, editing
-                complexity and turnaround time.
+                I shape each edit around your brand, goals, style and delivery needs so the final result feels aligned, polished and impactful.
               </p>
 
             </div>
@@ -302,7 +254,7 @@ export default function Services() {
                 href="#contact"
                 className="group flex w-full items-center justify-between rounded-2xl bg-white px-6 py-5 text-sm font-medium text-black transition-transform duration-300 hover:scale-[1.02] md:max-w-sm"
               >
-                <span>Have a different requirement?</span>
+                <span>Tell me about your project</span>
 
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black text-white">
                   <ArrowUpRight
